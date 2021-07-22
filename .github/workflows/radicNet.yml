@@ -29,6 +29,19 @@ jobs:
         with:
           MY_NAME: "Gserver"
 
+      - name: Organize files
+        id: organize
+        run: |
+          cd deployment
+          #rm -rf packages
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          echo "::set-output name=status::success"
+      - name: Generate release tag
+        id: tag
+        run: |
+          echo "::set-output name=release_tag::encryptSrv_$(date +"3.0.%d"'.jar')"
+          touch release.txt       
+          echo "::set-output name=status::success"
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
         env:
@@ -46,12 +59,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: Update
         run: |
           rm README.md
           date >> README.md         
           python gen.py
-
+ 
       - name: Commit 
         run: |
           git config user.name "${GITHUB_ACTOR}"
@@ -63,6 +77,4 @@ jobs:
         uses: GitRML/delete-workflow-runs@main
         with:
           retain_days: 1
-          keep_minimum_runs: 3    
-
-
+          keep_minimum_runs: 6   
